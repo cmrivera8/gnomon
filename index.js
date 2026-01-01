@@ -2,6 +2,7 @@ var repeating = require('repeating');
 var dateutil = require('dateutil');
 var chalk = require('chalk');
 var through = require('through');
+var { colorKeywords } = require('./colorkeywords');
 
 var termwidth = require('window-size').width;
 var newline = require('os').EOL;
@@ -55,6 +56,14 @@ module.exports = function(opts) {
   var fmt = opts.format || 'H:i:s.u O';
   var type = opts.type || 'elapsed-line';
 
+  function parseList(v) {
+    if (!v) return [];
+    return v.split(',').map(s => s.trim()).filter(Boolean);
+  }
+  opts.redList    = parseList(opts['redHighlight']);
+  opts.yellowList = parseList(opts['yellowHighlight']);
+  opts.greenList  = parseList(opts['greenHighlight']);
+
   var stampers = {
     'elapsed-line': function() {
       // Convert hrtime -> seconds -> ms
@@ -98,6 +107,10 @@ module.exports = function(opts) {
   maxLineLength = termwidth - chalk.stripColor(blank).length;
 
   function stampLine(stamp, line) {
+    if (line) {
+      line = colorKeywords(line, opts);
+    }
+
     var len = line ? chalk.stripColor(line).length : 0;
     if (len > maxLineLength) {
       return stamp + line.slice(0, maxLineLength) + newline +
