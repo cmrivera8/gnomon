@@ -1,3 +1,87 @@
+## Changes in This Fork (by Carlos RIVERA)
+
+This fork extends `gnomon` with additional features while preserving the original default behavior.
+
+### 1. Optional formatted elapsed timestamps
+`elapsed-line` and `elapsed-total` can now optionally use `--format` with PHP-style time formats.
+If `--format` is not provided, they continue to display numeric seconds as before.
+
+Example:
+```
+any-command | gnomon --type=elapsed-total --format="H:i:s.u"
+```
+
+### 2. Keyword highlighting
+Keyword highlighting can be applied to inline text (only the matched words are colored, not the whole line).
+
+New options:
+```
+--red-highlight="word1,word2"     or --rh
+--yellow-highlight="word1,word2"  or --yh
+--green-highlight="word1,word2"   or --gh
+```
+
+These options accept comma-separated lists and are case-insensitive.
+
+Defaults:
+```
+red-highlight:    "error"
+yellow-highlight: "warning"
+green-highlight:  (none)
+```
+
+If no list is supplied, defaults apply. Providing a list replaces the default set.
+
+Example:
+```
+some-command | gnomon --rh="fatal,error" --yh="warn,deprecated"
+```
+
+### Installing This Fork (from source)
+
+This fork is not published to npm. To use it, clone the repository and install it
+from local source:
+
+```
+git clone https://github.com/cmrivera8/gnomon.git
+cd gnomon
+npm install
+```
+
+You can then install it globally in one of two ways:
+
+
+#### Option 1: Using npm link (recommended for development)
+Creates a global symlink that points to your local working copy. Changes in the repo
+are immediately reflected when running `gnomon`.
+
+```
+npm link
+```
+
+To remove this version later:
+
+```
+npm unlink -g gnomon
+```
+
+
+#### Option 2: Install globally with npm
+Installs this fork as a normal global package (not a symlink).
+
+```
+npm install -g .
+```
+
+To remove it later:
+
+```
+npm uninstall -g gnomon
+```
+
+After either installation method, the `gnomon` command will use this fork instead of
+the npm-published version.
+
 # gnomon
 
 A command line utility, a bit like
@@ -9,7 +93,7 @@ processes where you'd like a historical record of what's taking so long.
 
 ![basic](https://cloud.githubusercontent.com/assets/1643758/13685018/17b4f76c-e6d4-11e5-8838-40fa52346ae8.gif)
 
-Piping anything to `gnomon` will prepend a timestamp to each line, indicating 
+Piping anything to `gnomon` will prepend a timestamp to each line, indicating
 how long that line was the last line in the buffer--that is, how long it took
 the next line to appear. By default, `gnomon` will display the seconds elapsed
 between each line, but that is configurable.
