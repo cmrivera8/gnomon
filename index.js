@@ -57,9 +57,27 @@ module.exports = function(opts) {
 
   var stampers = {
     'elapsed-line': function() {
+      // Convert hrtime -> seconds -> ms
+      var ms = durationToSeconds(elapsedLine) * 1000;
+
+      // If format explicitly requested, use dateutil formatting
+      if (opts.format) {
+        return dateutil.format(new Date(ms), fmt);
+      }
+
+      // Default behavior: numeric "1.2345s"
       return formatDuration(elapsedLine);
     },
     'elapsed-total': function() {
+      // Convert hrtime -> seconds -> ms
+      var ms = durationToSeconds(elapsedTotal) * 1000;
+
+      // If format explicitly requested, use dateutil formatting
+      if (opts.format) {
+        return dateutil.format(new Date(ms), fmt);
+      }
+
+      // Default behavior: numeric "1.2345s"
       return formatDuration(elapsedTotal);
     },
     'absolute': function() {
@@ -68,8 +86,10 @@ module.exports = function(opts) {
   };
 
   var maxDurLength, blank, maxLineLength;
-  if (type === 'absolute') {
-    maxDurLength = stampers.absolute().length;
+  if (type === 'absolute'
+  || (type === 'elapsed-line' && opts.format)
+  || (type === 'elapsed-total' && opts.format)) {
+    maxDurLength = stampers[type]().length;
   } else {
     maxDurLength = maxDisplaySecondsDigits + places + 2; // dot and 's'
   }
